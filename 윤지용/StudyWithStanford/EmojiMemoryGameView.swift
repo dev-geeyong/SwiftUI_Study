@@ -3,21 +3,23 @@ import SwiftUI
 
 struct EmojiMemoryGameView: View {
     
-    @ObservedObject var viewModel: EmojiMemoryGameViewModel
+    /*
+     @ObservedObject는 ObservableObject(ViewModel)의 변경사항을 관찰
+     ViewModel의 @Published 프로퍼티 변경 시 자동으로 View 업데이트
+     MVVM 패턴에서 View와 ViewModel을 연결하는 역할
+     */
+    @ObservedObject var viewModel: EmojiMemoryGameViewModel // ViewModel의 변경사항을 관찰하고 UI를 자동으로 업데이트
     
-//    @State private var cardFaceUps = Array(repeating: false, count: (theme1 + theme1).count)
-//    @State private var emojis = (theme1 + theme1).shuffled()
     @State var themeColor = Color.orange  // 테마 색상 추가
     
     var body: some View {
+        // viewModel의 변경사항이 감지되면 View가 자동으로 새로 그려짐
         VStack {
             Text("Memorize!").font(.largeTitle)
             ScrollView { cards }
             Button("Shuffle") {
                 viewModel.shuffle()
             }
-//            Spacer()
-//            themeButtons
         }
         .padding()
     }

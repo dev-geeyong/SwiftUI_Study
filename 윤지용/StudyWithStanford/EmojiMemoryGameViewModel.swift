@@ -11,11 +11,9 @@ import SwiftUI
 // MemoryGame - init(numberOfPairOfCards: Int, createCardContent: (Int) -> CardContent) {
 
 
-class EmojiMemoryGameViewModel: ObservableObject {
+class EmojiMemoryGameViewModel: ObservableObject { // ViewModel이 관찰 가능한 객체임을 선언 ViewModel (발행자) View는 @ObservedObject를 통해 이 변경사항을 구독
     
     private static let theme1 = ["👻", "🎃", "🦇","🧛","⚰️","🪄","🔮","🧿","🦄","🍭","🧙","🧌"]
-    private static let theme2 = ["⚽","🏏","🏓","🥏","🎾","🏄"]
-    private static let theme3 = ["🦈", "🦑", "🐙","🦉","🐧","🦖","🦧"]
     
     private static func createMemoryGame() -> MemoryGame<String> {
         
@@ -27,9 +25,9 @@ class EmojiMemoryGameViewModel: ObservableObject {
             }
         }
     }
-    
+    // @Published로 표시된 프로퍼티의 변경사항을 자동으로 발행
     @Published private var model = createMemoryGame()
-    
+    // 1. @Published로 표시된 프로퍼티가 변경되면
     var cards: Array<MemoryGame<String>.Card> {
         return model.cards
     }
@@ -39,7 +37,9 @@ class EmojiMemoryGameViewModel: ObservableObject {
     }
     
     func shuffle() {
-        model.shuffle()
+        model.shuffle()  // 2. 이 변경이 발생할 때
+               // 3. ObservableObject가 자동으로 알림을 보냄
+               // 4. 이 알림을 구독하고 있는 View들이 업데이트됨
     }
     /*
      
