@@ -29,3 +29,5 @@ ForEach(0..<emojis.count, id: \.self) { index in}
 반복문
 
 test
+
+
