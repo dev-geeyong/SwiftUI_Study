@@ -10,10 +10,11 @@ struct EmojiMemoryGameView: View {
      */
     @ObservedObject var viewModel: EmojiMemoryGameViewModel // ViewModel의 변경사항을 관찰하고 UI를 자동으로 업데이트
     
-    @State var themeColor = Color.orange  // 테마 색상 추가
+    @State var themeColor = Color.orange
     
     var body: some View {
         // viewModel의 변경사항이 감지되면 View가 자동으로 새로 그려짐
+        
         VStack {
             Text("Memorize!").font(.largeTitle)
             ScrollView { cards }
@@ -92,7 +93,7 @@ struct CardView: View {
             base.fill().opacity(card.isFaceUp ? 0 : 1)
         }
 //        .onTapGesture {
-//            isFaceUp.toggle()
+//            card.isFaceUp.toggle()
 //        }
     }
 }
