@@ -28,6 +28,9 @@ Button(action: {} // 버튼 누르면 실행
 ForEach(0..<emojis.count, id: \.self) { index in} // 반복문
 
 
+
+
+
 강의 3
 
 
