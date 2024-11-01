@@ -29,6 +29,8 @@ ForEach(0..<emojis.count, id: \.self) { index in} // 반복문
 
 
 강의 3
+
+
 MVVM은 앱의 유지보수성과 확장성을 높이기 위한 디자인 패턴
 	•	Model: 데이터와 비즈니스 로직을 담당
 	•	View: 사용자에게 보여지는 UI
