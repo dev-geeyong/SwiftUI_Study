@@ -25,12 +25,12 @@ ZStack {}
 <!-- 주석 -->
 Group {} 여러뷰를 하나의 단위로 묶을 수 있음
 <!-- 주석 -->
-```
+```swift
 Button(action: {} // 버튼 누르면 실행
 }, label: {}) // 버튼 타이틀
 ```
 <!-- 주석 -->
-```
+```swift
 ForEach(0..<emojis.count, id: \.self) { index in} // 반복문
 ```
 
@@ -56,7 +56,7 @@ SwiftUI는 선언형 프로그래밍 방식으로, 데이터의 변화에 따라
 	•	특징: 값이 변경되면 해당 View가 자동으로 다시 렌더링
 
 예제:
-```
+```swift
 struct CounterView: View {
     @State private var count = 0
     var body: some View {
@@ -80,7 +80,7 @@ struct CounterView: View {
 	•	특징: 양방향 데이터 바인딩을 제공
 
 예제:
-```
+```swift
 struct ParentView: View {
     @State private var isOn = false
     var body: some View {
@@ -106,7 +106,7 @@ struct ToggleView: View {
 	•	특징: @Published로 선언된 프로퍼티의 변화를 관찰
 
 예제:
-```
+```swift
 class UserSettings: ObservableObject {
     @Published var username: String = "Guest"
 }
@@ -134,7 +134,7 @@ struct ContentView: View {
 	•	특징: 여러 View에서 동일한 객체를 사용할 수 있음
 
 예제:
-```
+```swift
 class ThemeSettings: ObservableObject {
     @Published var primaryColor: Color = .blue
 }
