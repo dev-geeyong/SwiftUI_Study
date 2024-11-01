@@ -140,3 +140,14 @@ struct ContentView: View {
 설명:
 	•	ThemeSettings 객체를 environmentObject로 주입하여 하위 View에서 사용할 수 있음
 	•	ContentView에서는 @EnvironmentObject로 theme에 접근
+
+데이터 변경과 View 업데이트 메커니즘
+	•	데이터 변경: ViewModel에서 @Published 프로퍼티가 변경됩니다.
+	•	View 업데이트: @ObservedObject로 ViewModel을 관찰하고 있으므로, 데이터 변경 시 View가 자동으로 업데이트됩니다.
+	•	상태 관리: View의 일시적인 상태(예: 사용자 입력)는 @State로 관리합니다.
+베스트 프랙티스 및 팁
+	•	파일 분리: 각 역할(Model, View, ViewModel)에 따라 파일을 분리하여 관리합니다.
+	•	명확한 데이터 흐름: 데이터가 어떻게 이동하는지 명확하게 이해하고 설계합니다.
+	•	재사용 가능한 컴포넌트: View를 작은 단위로 분리하여 재사용성을 높입니다.
+	•	의존성 관리: ViewModel에 비즈니스 로직을 집중시키고, View는 UI 표현에만 집중합니다.
+
