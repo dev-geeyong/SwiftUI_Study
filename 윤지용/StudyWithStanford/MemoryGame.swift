@@ -8,11 +8,21 @@
 import Foundation
 
 
-struct MemoryGame<CardContent> {
+struct MemoryGame<CardContent> where CardContent: Equatable { //CardContent 타입이 반드시 Equatable 프로토콜을 준수해야 한다는 조건을 붙인 것입니다
     private(set) var cards: Array<Card>
     
-    func choose(_ card: Card) {
-        
+    mutating func choose(_ card: Card) {
+        let index = index(of: card)
+        cards[index].isFaceUp.toggle()
+    }
+    
+    func index(of card: Card) -> Int {
+        for index in cards.indices {
+            if cards[index].id == card.id {
+                return index
+            }
+        }
+        return 0 // FIXME: bug
     }
 
     mutating func shuffle() {
@@ -24,16 +34,24 @@ struct MemoryGame<CardContent> {
         
         for index in 0..<max(2,numberOfPairOfCards) {
             let content = createCardContent(index)
-            cards.append(Card(content: content))
-            cards.append(Card(content: content))
+            cards.append(Card(content: content, id: "\(index + 1)a"))
+            cards.append(Card(content: content, id: "\(index + 1)b"))
         }
     }
     
     
-    struct Card {
+    struct Card: Equatable, Identifiable, CustomDebugStringConvertible {
+        var debugDescription: String {
+           return "\(id): \(content)"
+        }
+        
+
+        
+        
         var isFaceUp: Bool = true
         var isMatched: Bool = false
         var content: CardContent
+        var id: String
     }
 }
 /*

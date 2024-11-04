@@ -14,10 +14,12 @@ struct EmojiMemoryGameView: View {
     
     var body: some View {
         // viewModel의 변경사항이 감지되면 View가 자동으로 새로 그려짐
-        
+         
         VStack {
             Text("Memorize!").font(.largeTitle)
-            ScrollView { cards }
+            ScrollView { cards
+                .animation(.default, value: viewModel.cards)
+            }
             Button("Shuffle") {
                 viewModel.shuffle()
             }
@@ -27,10 +29,15 @@ struct EmojiMemoryGameView: View {
     
     var cards: some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 85),spacing: 0)],spacing: 0) {
-            ForEach(0..<viewModel.cards.count, id: \.self) { index in
-                CardView(viewModel.cards[index])
+//            ForEach(0..<viewModel.cards.count, id: \.self) { index in
+//                CardView(viewModel.cards[index])
+            ForEach(viewModel.cards) { card in
+                CardView(card)
                 .aspectRatio(2/3, contentMode: .fit)
                 .padding(4)
+                .onTapGesture {
+                    viewModel.choose(card)
+                }
             }
         }
         .foregroundColor(themeColor)
