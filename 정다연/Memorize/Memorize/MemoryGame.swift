@@ -19,12 +19,48 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
         }
     }
   
+  var indexOfTheOneAndOnlyFaceUpCard: Int? {
+    get {
+      var faceUpCardIndices = [Int]()
+      for index in cards.indices {
+        if cards[index].isFaceUp {
+          faceUpCardIndices.append(index)
+        }
+      }
+      if faceUpCardIndices.count == 1 {
+        return faceUpCardIndices.first
+      } else {
+        return nil
+      }
+    }
+    set {
+      for index in cards.indices {
+        if index == newValue {
+          cards[index].isFaceUp = true
+        } else {
+          cards[index].isFaceUp = false
+        }
+      }
+    }
+  }
+  
   mutating func choose(_ card: Card) {
-    let chosenIndex = index(of: card)
-    cards[chosenIndex].isFaceUp.toggle()
+    if let chosenIndex = cards.firstIndex(where: { $0.id == card.id }) {
+      if !cards[chosenIndex].isFaceUp && !cards[chosenIndex].isMatched {
+        if let potentialMatchIndex = indexOfTheOneAndOnlyFaceUpCard {
+          if cards[chosenIndex].content == cards[potentialMatchIndex].content {
+            cards[chosenIndex].isMatched = true
+            cards[potentialMatchIndex].isMatched = true
+          }
+        } else {
+          indexOfTheOneAndOnlyFaceUpCard = chosenIndex
+        }
+        cards[chosenIndex].isFaceUp = true
+      }
+    }
   }
     
-  func index(of card: Card) -> Int {
+  func index(of card: Card) -> Int? {
     for index in cards.indices {
       if cards[index].id == card.id {
         return index
@@ -47,7 +83,7 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
 //      lhs.content == rhs.content
 //    }
     // 모든 항목이 Equatable하면 == 을 정의하지 않아도 됨
-        var isFaceUp = true
+        var isFaceUp = false
         var isMatched = false
         let content: CardContent
     
