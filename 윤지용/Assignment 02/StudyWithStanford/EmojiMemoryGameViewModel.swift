@@ -10,13 +10,13 @@ import SwiftUI
 class EmojiMemoryGameViewModel: ObservableObject { 
     // ViewModel이 관찰 가능한 객체임을 선언 View는 @ObservedObject를 통해 이 변경사항을 구독
     
-    private static let theme1 = ["👻", "🎃", "🦇","🧛","⚰️","🪄","🔮","🧿","🦄","🍭","🧙","🧌"]
+    
     
     private static func createMemoryGame() -> MemoryGame<String> {
-        
-        MemoryGame<String>(numberOfPairOfCards: 16) { pairIndex in
-            if theme1.indices.contains(pairIndex) {
-                theme1[pairIndex]
+        let theme = Theme.randomTheme()
+        return MemoryGame<String>(item: theme) { pairIndex in
+            if theme.items.indices.contains(pairIndex) {
+                theme.items[pairIndex]
             } else {
                 "🏄"
             }
@@ -26,7 +26,7 @@ class EmojiMemoryGameViewModel: ObservableObject {
     @Published private var model = createMemoryGame()
     // 1. @Published로 표시된 프로퍼티가 변경되면
     
-
+    
     // MARK: - Intents
     func choose(_ card: MemoryGame<String>.Card){
         model.choose(card)
@@ -34,12 +34,18 @@ class EmojiMemoryGameViewModel: ObservableObject {
     var cards: Array<MemoryGame<String>.Card> {
         return model.cards
     }
+    var score: Int {
+        model.score
+    }
     func shuffle() {
         model.shuffle()  // 2. 이 변경이 발생할 때
                // 3. ObservableObject가 자동으로 알림을 보냄
                // 4. 이 알림을 구독하고 있는 View들이 업데이트됨
     }
-    /*
+    func newGame() {
+        model = EmojiMemoryGameViewModel.createMemoryGame()
+    }
+    /*dg
      
      인스턴스 멤버 초기화 오류:
      model = createMemoryGame()에서 에러가 발생합니다

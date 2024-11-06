@@ -14,67 +14,48 @@ struct EmojiMemoryGameView: View {
     
     var body: some View {
         // viewModel의 변경사항이 감지되면 View가 자동으로 새로 그려짐
-         
+        
         VStack {
-            Text("Memorize!").font(.largeTitle)
+            HStack{
+                Text(viewModel.cards.first?.title ?? "").font(.largeTitle)
+                Spacer()
+                Text("Score: \(viewModel.score)").font(.largeTitle)
+            }
             ScrollView { cards
                 .animation(.default, value: viewModel.cards)
             }
-            Button("Shuffle") {
-                viewModel.shuffle()
+            Button("NewGame") {
+                viewModel.newGame()
             }
         }
         .padding()
     }
     
     var cards: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 85),spacing: 0)],spacing: 0) {
-//            ForEach(0..<viewModel.cards.count, id: \.self) { index in
-//                CardView(viewModel.cards[index])
-            ForEach(viewModel.cards) { card in
-                CardView(card)
-                .aspectRatio(2/3, contentMode: .fit)
-                .padding(4)
-                .onTapGesture {
-                    viewModel.choose(card)
-                }
-            }
-        }
-        .foregroundColor(themeColor)
+       LazyVGrid(columns: [GridItem(.adaptive(minimum: 85),spacing: 0)],spacing: 0) {
+           ForEach(viewModel.cards) { card in
+               CardView(card)
+                   .aspectRatio(2/3, contentMode: .fit)
+                   .padding(4)
+                   .onTapGesture {
+                       viewModel.choose(card)
+                   }
+           }
+       }
+       .foregroundStyle(
+           LinearGradient(
+               colors: [
+                   Color(uiColor: viewModel.cards.first?.color ?? .orange),
+                   Color(uiColor: viewModel.cards.first?.color ?? .orange).opacity(0.5)
+               ],
+               startPoint: .topLeading,
+               endPoint: .bottomTrailing
+           )
+       )
     }
     
-//    var themeButtons: some View {
-//        HStack {
-//            themeButton(name: "Halloween",
-//                        symbol: "party.popper.fill",
-//                        theme: theme1,
-//                        color: .orange)
-//            themeButton(name: "Sports",
-//                        symbol: "tennisball.fill",
-//                        theme: theme2,
-//                        color: .blue)
-//            themeButton(name: "Animals",
-//                        symbol: "pawprint.fill",
-//                        theme: theme3,
-//                        color: .red)
-//        }
-//        .imageScale(.large)
-    }
-    
-//    func themeButton(name: String, symbol: String, theme: [String], color: Color) -> some View {
-//        Button(action: {
-//            emojis = (theme + theme).shuffled()  // 테마의 카드 쌍을 섞음
-//            cardFaceUps = Array(repeating: false, count: emojis.count)
-//            themeColor = color
-//        }, label: {
-//            VStack {
-//                Image(systemName: symbol)
-//                    .font(.title)
-//                Text(name)
-//                    .font(.caption)
-//            }
-//        })
-//    }
+}
+
 
 
 struct CardView: View {
@@ -100,9 +81,6 @@ struct CardView: View {
             base.fill().opacity(card.isFaceUp ? 0 : 1)
         }
         .opacity(card.isFaceUp || !card.isMatched ? 1 : 0)
-//        .onTapGesture {
-//            card.isFaceUp.toggle()
-//        }
     }
 }
 

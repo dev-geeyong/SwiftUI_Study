@@ -6,37 +6,21 @@
 // Model
 
 import Foundation
+import UIKit
 
 
 struct MemoryGame<CardContent> where CardContent: Equatable { //CardContent 타입이 반드시 Equatable 프로토콜을 준수해야 한다는 조건을 붙인 것입니다
     private(set) var cards: Array<Card>
-    
+    private(set) var score: Int = 0
+    private var seenCards: Set<String> = []  // 이전에 본 카드들의 ID를 추적
     var indexOfTheOneAndOnlyFacUpCard: Int? {
         get {
             let faceUpCardIndices = cards.indices.filter { index in cards[index].isFaceUp }
             return faceUpCardIndices.count == 1 ? faceUpCardIndices.first : nil
-//            var faceUpCardIndices = [Int]()
-//            for index in cards.indices {
-//                if cards[index].isFaceUp {
-//                    faceUpCardIndices.append(index)
-//                }
-//            }
-//            if faceUpCardIndices.count == 1 {
-//                return faceUpCardIndices.first
-//            } else {
-//                return nil
-//            }
         }
         
         set {
             cards.indices.forEach { cards[$0].isFaceUp = (newValue == $0)}
-//            for index in cards.indices {
-//                if index == newValue {
-//                    cards[index].isFaceUp = true
-//                } else{
-//                    cards[index].isFaceUp = false
-//                }
-//            }
         }
     }
     mutating func choose(_ card: Card) {
@@ -46,8 +30,17 @@ struct MemoryGame<CardContent> where CardContent: Equatable { //CardContent 타�
                     if cards[chosenIndex].content == cards[potentialMatchIndex].content {
                         cards[chosenIndex].isMatched = true
                         cards[potentialMatchIndex].isMatched = true
+                        score += 2
+                    } else {
+                        if seenCards.contains(cards[chosenIndex].id) {
+                            score -= 1
+                        }
+                        if seenCards.contains(cards[potentialMatchIndex].id) {
+                            score -= 1
+                        }
                     }
-                    
+                    seenCards.insert(cards[chosenIndex].id)
+                    seenCards.insert(cards[potentialMatchIndex].id)
                 } else {
                     indexOfTheOneAndOnlyFacUpCard = chosenIndex
                 }
@@ -60,31 +53,75 @@ struct MemoryGame<CardContent> where CardContent: Equatable { //CardContent 타�
         cards.shuffle()
     }
     
-    init(numberOfPairOfCards: Int, createCardContent: (Int) -> CardContent) {
+    init(item: Theme, createCardContent: (Int) -> CardContent) {
         cards = Array<Card>()
         
-        for index in 0..<max(2,numberOfPairOfCards) {
+        for index in 0..<max(2,item.number) {
             let content = createCardContent(index)
-            cards.append(Card(content: content, id: "\(index + 1)a"))
-            cards.append(Card(content: content, id: "\(index + 1)b"))
+            cards.append(Card(content: content, id: "\(index + 1)a", color: item.color, title: item.name))
+            cards.append(Card(content: content, id: "\(index + 1)b", color: item.color, title: item.name))
         }
+        cards.shuffle()
     }
     
     
-    struct Card: Equatable, Identifiable, CustomDebugStringConvertible {
-        var debugDescription: String {
-            return "\(id): \(content)"
-        }
-        
-        
-        
-        
+    struct Card: Equatable, Identifiable {
+
         var isFaceUp: Bool = false
         var isMatched: Bool = false
         var content: CardContent
         var id: String
+        var color: UIColor
+        var title: String
+        
+        
     }
 }
+struct Theme {
+     let name: String
+     let items: [String]
+     let number: Int
+     let color: UIColor
+     
+     // 테마 데이터를 static 프로퍼티로 Model 안에 정의
+     static let all: [Theme] = [
+        Theme(name: "Halloween",
+              items: ["👻", "🎃", "🦇", "🧛", "⚰️", "🪄", "🔮", "🧿", "🦄", "🍭", "🧙", "🧌"],
+              number: 12,
+              color: UIColor.orange),
+        
+        Theme(name: "Animals",
+              items: ["🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯", "🦁", "🐮"],
+              number: 12,
+              color: UIColor.brown),
+        
+        Theme(name: "Sports",
+              items: ["⚽️", "🏀", "🏈", "⚾️", "🎾", "🏐", "🏉", "🎱", "🏓", "🏸", "🏒", "⛳️"],
+              number: 12,
+              color: UIColor.blue),
+        
+        Theme(name: "Food",
+              items: ["🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🫐", "🍒", "🥝", "🍑"],
+              number: 12,
+              color: UIColor.red),
+        
+        Theme(name: "Weather",
+              items: ["☀️", "🌤", "☁️", "🌧", "⛈", "🌩", "🌨", "❄️", "💨", "🌪", "☔️", "⚡️"],
+              number: 8,
+              color: UIColor.gray),
+        
+        Theme(name: "Space",
+              items: ["🌎", "🌙", "⭐️", "☄️", "🚀", "🛸", "🌠", "🌌", "👨‍🚀", "🌍", "🌏", "🪐"],
+              number: 12,
+              color: UIColor.purple)
+     ]
+     
+     // 랜덤 테마를 가져오는 static 메서드
+     static func randomTheme() -> Theme {
+         all.randomElement()!
+     }
+ }
+
 /*
  ⚠️ mutating 없이 cards를 수정하려 하면 에러 발생
  struct는 값 타입이므로 기본적으로 불변(immutable)입니다
