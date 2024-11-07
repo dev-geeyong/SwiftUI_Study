@@ -39,16 +39,7 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
       }
     }
   }
-    
-  func index(of card: Card) -> Int? {
-    for index in cards.indices {
-      if cards[index].id == card.id {
-        return index
-      }
-    }
-    return 0  // FIXME: bogus!
-  }
-  
+      
     mutating func shuffle() {
         cards.shuffle()
 //      print(cards)
