@@ -171,4 +171,312 @@ struct ContentView: View {
 	•	명확한 데이터 흐름: 데이터가 어떻게 이동하는지 명확하게 이해하고 설계
 	•	재사용 가능한 컴포넌트: View를 작은 단위로 분리하여 재사용성을 높임
 	•	의존성 관리: ViewModel에 비즈니스 로직을 집중시키고, View는 UI 표현에만 집중
+# 5강
+
+---
+
+## Layout (레이아웃)
+
+### SwiftUI의 Layout
+
+- **Container Views**는 자식 뷰에 공간을 "제공"
+- 자식 **Views**는 자신이 원하는 크기를 선택 (오직 자식 뷰만이 이를 결정할 수 있다).
+- **Container Views**는 제공한 공간 내에서 자식 뷰들을 배치
+
+### HStack과 VStack
+
+- 스택은 제공받은 공간을 하위 뷰에게 나누어준다.
+- 가장 "유연하지 않은"(고정된 크기를 선호하는) 뷰부터 공간을 배정
+- 예: **Image**는 고정된 크기를 선호, **Text**는 텍스트에 맞춰 크기를 조정, **RoundedRectangle**은 제공된 모든 공간을 사용
+- 유연한 뷰들은 공유된 공간을 균등하게 나눈다
+- **Spacer**와 **Divider**는 스택 내부에서 공간을 나누는 중요한 역할
+
+### 예시 코드
+
+```swift
+HStack {
+    Image(systemName: "star.fill")
+    Text("Hello World")
+    RoundedRectangle(cornerRadius: 10)
+}
+```
+- 위 코드에서 **HStack**은 **Image**, **Text**, **RoundedRectangle**을 포함하고 있으며, 각각 제공받은 공간을 적절히 나눔
+
+### LazyHStack과 LazyVStack
+
+- **Lazy** 버전의 스택은 보이지 않는 뷰를 생성하지 않음
+- **ScrollView**와 함께 사용될 때 유용
+
+### ZStack
+
+- 자식 뷰를 겹쳐서 배치
+- 하나의 자식 뷰가 완전히 유연하다면, ZStack 자체도 유연
+
+```swift
+ZStack {
+    Color.blue
+    Text("Hello ZStack")
+        .foregroundColor(.white)
+}
+```
+- **ZStack**은 **Color**와 **Text**를 겹쳐서 배치
+
+### Modifiers
+
+- **View Modifier**는 새로운 뷰를 반환
+- **.padding**, **.aspectRatio** 등의 modifier는 뷰의 레이아웃에도 관여할 수 있다
+
+---
+
+## @ViewBuilder
+
+`@ViewBuilder`는 Swift에서 **var**에 특별한 기능을 추가하기 위한 메커니즘을 기반으로 한다. 이것은 여러 개의 **View**를 보다 편리한 문법으로 작성할 수 있게 해준다
+
+- **@ViewBuilder**는 **list of Views**로 해석하여 하나의 **View**로 결합
+- 조건문을 사용해 특정 조건에 따라 다른 뷰를 반환할 수 있으며, 여러 개의 **View**들을 하나로 묶어준다
+
+```swift
+@ViewBuilder
+func front(of card: Card) -> some View {
+    RoundedRectangle(cornerRadius: 20)
+        .fill(.white)
+        .overlay(Text(card.content))
+}
+```
+- 함수나 읽기 전용 계산 속성에 **@ViewBuilder**를 적용할 수 있다
+
+### 조건부 View 처리
+
+- `if-else`, `switch`, `if let`과 같은 조건문을 사용해 **View**를 포함하거나 제외할 수 있다
+
+```swift
+@ViewBuilder
+var someView: some View {
+    if someCondition {
+        Text("Condition is true")
+    } else {
+        Text("Condition is false")
+    }
+}
+```
+---
+
+## Shape
+
+SwiftUI에서 커스텀 도형을 그리기 위해 **Shape** 프로토콜을 사용할 수 있다.
+
+- 직접 도형을 정의하고 **Canvas**에 그릴 수 있으며, 이로써 다양한 커스텀 도형을 만들 수 있다.
+
+```swift
+struct Pie: Shape {
+    var startAngle: Angle
+    var endAngle: Angle
+    var clockwise: Bool
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let radius = min(rect.width, rect.height) / 2
+        path.move(to: center)
+        path.addArc(center: center,
+                    radius: radius,
+                    startAngle: startAngle,
+                    endAngle: endAngle,
+                    clockwise: !clockwise)
+        path.closeSubpath()
+        return path
+    }
+}
+```
+
+# 6강
+---
+
+## Enums (열거형)
+
+**Enum**은 데이터 구조의 또 다른 형태로서 `struct`와 `class` 외에 사용할 수 있다. `enum`은 유한한 상태를 가질 수 있으며, 각 상태는 구분되는 값
+
+```swift
+enum FastFoodMenuItem {
+    case hamburger
+    case fries
+    case drink
+    case cookie
+}
+```
+
+- **Enum은 값 타입(Value Type)**이며, `struct`와 마찬가지로 복사
+
+### Associated Data (연관 데이터)
+
+각 상태는 연관 데이터를 가질 수 있음
+
+```swift
+enum FastFoodMenuItem {
+    case hamburger(numberOfPatties: Int)
+    case fries(size: FryOrderSize)
+    case drink(String, ounces: Int)
+    case cookie
+}
+```
+
+- 예를 들어, `drink`는 두 개의 연관 데이터를 가질 수 있음 (브랜드명과 용량).
+- `FryOrderSize`와 같은 데이터도 별도의 `enum`으로 정의
+
+### Enum의 값 설정
+
+Swift는 값의 타입을 추론할 수 있지만, 명시적으로 설정하지 않으면 추론에 실패할 수 있다
+
+```swift
+let menuItem = FastFoodMenuItem.hamburger(numberOfPatties: 2)
+var otherItem: FastFoodMenuItem = .cookie
+```
+
+아래와 같은 코드는 오류가 발생
+
+```swift
+var yetAnotherItem = .cookie // 오류 발생
+```
+
+### Enum 상태 확인
+
+`switch` 구문을 사용하여 `enum`의 상태를 확인할 수 있다
+
+```swift
+var menuItem = FastFoodMenuItem.hamburger(numberOfPatties: 2)
+switch menuItem {
+    case .hamburger: print("burger")
+    case .fries: print("fries")
+    case .drink: print("drink")
+    case .cookie: print("cookie")
+}
+```
+
+Swift는 `FastFoodMenuItem` 타입을 추론할 수 있으므로 `switch`에서 완전한 이름을 사용할 필요가 없다
+
+### `break`와 `default`
+
+- `break`: 특정 케이스에서 아무 작업도 하지 않으려면 `break`를 사용
+- `default`: 모든 케이스를 처리하지 않으려면 `default`를 사용하여 나머지 케이스를 처리
+
+### Multiple Lines Allowed
+
+각 `switch` 케이스에서 여러 줄의 코드를 사용할 수 있으며, 다음 케이스로 넘어가지 않는다
+
+```swift
+switch menuItem {
+    case .hamburger: print("burger")
+    case .fries:
+        print("yummy")
+        print("fries")
+    case .drink: print("drink")
+    case .cookie: print("cookie")
+}
+```
+
+### Associated Data 접근
+
+연관 데이터는 `switch` 구문과 `let` 구문을 사용하여 접근할 수 있다
+
+```swift
+var menuItem = FastFoodMenuItem.drink("Coke", ounces: 32)
+switch menuItem {
+    case .hamburger(let pattyCount): print("a burger with \(pattyCount) patties!")
+    case .fries(let size): print("a \(size) order of fries!")
+    case .drink(let brand, let ounces): print("a \(ounces)oz \(brand)")
+    case .cookie: print("a cookie!")
+}
+```
+
+### Methods와 Properties
+
+- **메서드**는 열거형 내에 정의할 수 있지만, **저장 속성(stored property)**는 가질 수 없다. 대신 **계산 속성(computed property)**는 가능
+
+
+```swift
+enum FastFoodMenuItem {
+    case hamburger(numberOfPatties: Int)
+    case fries(size: FryOrderSize)
+    case drink(String, ounces: Int)
+    case cookie
+
+    func isIncludedInSpecialOrder(number: Int) -> Bool {
+        switch self {
+        case .hamburger(let pattyCount): return pattyCount == number
+        case .fries, .cookie: return true
+        case .drink(_, let ounces): return ounces == 16
+        }
+    }
+}
+```
+
+### All Cases of an Enumeration
+
+모든 열거형의 케이스를 반복하려면 `CaseIterable` 프로토콜을 사용
+
+```swift
+enum TeslaModel: CaseIterable {
+    case X
+    case S
+    case Three
+    case Y
+}
+
+for model in TeslaModel.allCases {
+    reportSalesNumbers(for: model)
+}
+```
+
+---
+
+## Optionals (옵셔널)
+
+옵셔널은 Swift에서 매우 중요한 타입이며, 사실 열거형(`enum`)
+
+```swift
+enum Optional<T> {
+    case none
+    case some(T)
+}
+```
+
+옵셔널은 두 가지 값만 가질 수 있다: 값이 설정된 경우(`some`)와 설정되지 않은 경우(`none`).
+
+### 옵셔널 선언
+
+옵셔널 타입을 선언하려면 `T?` 문법을 사용
+
+```swift
+var hello: String? = "hello"
+var hello: String? = nil
+```
+
+옵셔널은 항상 기본적으로 `nil`로 시작
+
+### 옵셔널 값 접근
+
+옵셔널의 값을 접근할 때는 강제 추출(`!`)을 사용하거나 안전하게 추출하려면 `if let`을 사용
+
+```swift
+let hello: String? = ...
+print(hello!) // 강제 추출 (비추천, 위험)
+
+if let hello = hello {
+    print(hello)
+} else {
+    // 다른 작업 수행
+}
+```
+
+또는 `switch` 구문을 사용하여 옵셔널의 상태를 확인할 수 있다
+
+### Nil-Coalescing Operator (`??`)
+
+옵셔널이 `nil`일 경우 기본 값을 설정하려면 `??` 연산자를 사용
+
+```swift
+let x: String? = ...
+let y = x ?? "foo"
+```
+
 
