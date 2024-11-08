@@ -7,13 +7,6 @@
 
 import SwiftUI
 
-/*
- 1. 애니메이션 처리
- - Equatable
- - Hashable
- - Identifiable
- */
-
 struct EmojiMemoryGameView: View {
     @ObservedObject var viewModel: EmojiMemoryGame
     private let aspectRatio: CGFloat = 2/3
