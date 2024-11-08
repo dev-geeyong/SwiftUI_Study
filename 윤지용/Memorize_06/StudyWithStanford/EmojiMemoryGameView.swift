@@ -1,9 +1,4 @@
-//
-//  EmojiMemoryGameView.swift
-//  Memorize
-//
-//  Created by Ruban on 2024-02-10.
-//
+
 
 import SwiftUI
 
@@ -23,6 +18,8 @@ struct EmojiMemoryGameView: View {
     }
     
     private var cards: some View {
+//        AspectVGrid(viewModel.cards, aspectRatio: aspectRatio, content: <#T##(Item) -> ItemView#>)
+        
         AspectVGrid(viewModel.cards, aspectRatio: aspectRatio) { card in
             CardView(card)
                 .padding(4)
