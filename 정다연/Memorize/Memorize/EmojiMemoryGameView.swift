@@ -55,7 +55,8 @@ struct CardView: View {
                     .minimumScaleFactor(0.01)
                     .aspectRatio(1, contentMode: .fit)
             }
-//            .opacity(card.isFaceUp ? 1:0)
+            .opacity(card.isFaceUp ? 1:0)
+            
             base.fill()
                 .opacity(card.isFaceUp || card.isMatched ? 0 : 1)
         }
