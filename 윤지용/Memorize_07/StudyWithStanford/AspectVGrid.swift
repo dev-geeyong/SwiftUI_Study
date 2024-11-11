@@ -1,9 +1,4 @@
-//
-//  AspectVGrid.swift
-//  Memorize
-//
-//  Created by Ruban on 2024-02-12.
-//
+
 
 import SwiftUI
 

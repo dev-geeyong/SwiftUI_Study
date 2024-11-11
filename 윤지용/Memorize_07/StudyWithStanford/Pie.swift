@@ -9,13 +9,13 @@ import SwiftUI
 import CoreGraphics
 
 struct Pie: Shape {
-    var startAngle: Angle = .zero
-    let endAngle: Angle
-    let clockwise = true
+    var startAngle: Angle = .zero  // 시작 각도 (기본값 0)
+    let endAngle: Angle           // 끝 각도
+    let clockwise = true          // 회전 방향
     
     func path(in rect: CGRect) -> Path {
-        let startAngle = startAngle - .degrees(90)
-        let endAngle = endAngle - .degrees(90)
+        let startAngle = startAngle - .degrees(90)  // 시작 각도를 90도 앞당김
+        let endAngle = endAngle - .degrees(90)      // 끝 각도를 90도 앞당김
         let center = CGPoint(x: rect.midX, y: rect.midY)
         let radius = min(rect.width, rect.height) / 2
         

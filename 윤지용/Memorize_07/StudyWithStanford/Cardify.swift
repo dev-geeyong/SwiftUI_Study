@@ -35,3 +35,12 @@ extension View {
         modifier(Cardify(isFaceUp: isFaceUp))
     }
 }
+
+/*
+ 이러한 분리를 통해:
+ 코드의 재사용성 향상
+ 유지보수 용이성 증가
+ 책임의 명확한 분리
+ 확장성 개선
+ SwiftUI의 디자인 패턴 준수
+ */
