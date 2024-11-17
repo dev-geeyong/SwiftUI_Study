@@ -80,9 +80,6 @@ struct CardView: View {
     var body: some View {
         ZStack {
             let base = RoundedRectangle(cornerRadius: 12)
-            base.strokeBorder(lineWidth: 2)
-                .background(base.fill(.white))
-                .opacity(card.isFaceUp ? 1 : 0)
             Text(card.content)
                 .font(.system(size: Constants.FontSize.largest))
                 .minimumScaleFactor(Constants.FontSize.scaleFactor)
@@ -92,10 +89,9 @@ struct CardView: View {
                 .rotationEffect(.degrees(card.isMatched ? 360 : 0))
                 .animation(.spin(duration: 1), value: card.isMatched)
                 .opacity(card.isFaceUp ? 1 : 0)
-            base.fill()
-                .opacity(card.isFaceUp ? 0 : 1)
         }
         .padding(Constants.inset)
+        .cardify(isFaceUp: card.isFaceUp)
         .opacity(card.isFaceUp || !card.isMatched ? 1 : 0)
     }
     
