@@ -480,3 +480,182 @@ let y = x ?? "foo"
 ```
 
 
+
+# 10강 Assignment
+
+## Swift Programming Language
+
+### 1. 문자열과 문자 (Strings and Characters)
+- `String`은 Swift의 기본적인 텍스트 데이터 타입임. Unicode 지원으로 다국어 텍스트를 안정적으로 처리할 수 있음.
+- 문자열은 값 타입이며, 메모리 효율성을 높이고 안전성을 보장함.
+- 문자열 연결은 `+` 연산자로 가능하며, 문자열 보간법(`\(변수)`)으로 가독성 높은 문자열 생성 가능함.
+- 예시:
+  ```swift
+  let greeting = "Hello"
+  let name = "Alice"
+  let fullGreeting = "\(greeting), \(name)!" // "Hello, Alice!"
+  ```
+- `Character` 타입은 하나의 문자 단위를 나타냄. `String`은 `Character`의 배열로 구성됨.
+- 문자열의 각 문자는 반복문을 통해 순회 가능함.
+  ```swift
+  for char in "Hello" {
+      print(char) // H e l l o
+  }
+  ```
+
+### 2. 제어 흐름 (Control Flow)
+- 조건문은 `if`, `guard`, `switch`를 사용함. `if-else`는 기본적인 분기 처리에 사용되며, `guard`는 조기 탈출에 유용함.
+  ```swift
+  let age = 20
+  if age >= 18 {
+      print("Adult")
+  } else {
+      print("Minor")
+  }
+
+  func checkName(_ name: String?) {
+      guard let validName = name else {
+          print("Name is nil")
+          return
+      }
+      print("Hello, \(validName)")
+  }
+  ```
+- 반복문은 `for-in`, `while`, `repeat-while`을 사용함. `continue`와 `break`를 통해 제어 흐름을 조절함.
+- 레이블이 있는 구문(`Labeled Statements`)은 중첩된 루프에서 특정 루프를 종료하거나 계속할 때 사용함.
+  ```swift
+  outerLoop: for i in 1...5 {
+      for j in 1...5 {
+          if j == 3 {
+              continue outerLoop
+          }
+          print("\(i), \(j)")
+      }
+  }
+  ```
+
+### 3. 열거형 (Enumerations)
+- 열거형은 연관된 값의 그룹을 정의함. 각 열거형 케이스는 `Int`, `String` 등 원시 값을 가질 수 있음.
+- 열거형은 `case` 키워드로 정의되며, 메서드나 계산 프로퍼티를 포함할 수 있음.
+  ```swift
+  enum Direction {
+      case north
+      case south
+      case east
+      case west
+  }
+
+  let move = Direction.north
+  switch move {
+  case .north:
+      print("Go North")
+  default:
+      print("Other direction")
+  }
+  ```
+- 재귀 열거형은 `indirect` 키워드를 사용해 정의 가능하지만, 복잡성을 높이므로 피하는 것이 좋음.
+
+### 4. 상속 및 초기화 (Inheritance and Initialization)
+- 클래스는 부모 클래스를 상속받아 코드 재사용성을 높임. SwiftUI에서는 상속보다는 구조체와 프로토콜 지향 설계가 선호됨.
+  ```swift
+  class Vehicle {
+      var currentSpeed = 0.0
+      func describe() -> String {
+          return "Traveling at \(currentSpeed) miles per hour"
+      }
+  }
+
+  class Car: Vehicle {
+      var hasSunroof = false
+  }
+
+  let myCar = Car()
+  myCar.currentSpeed = 50.0
+  print(myCar.describe()) // "Traveling at 50.0 miles per hour"
+  ```
+- 클래스의 초기화는 `init()` 메서드로 정의하며, `required` 키워드는 하위 클래스에서 필수 구현을 의미함.
+
+### 5. 소멸화 (Deinitialization)
+- 클래스 인스턴스가 메모리에서 해제될 때 `deinit` 메서드가 호출됨. 주로 리소스 해제 작업에 사용함.
+  ```swift
+  class FileHandler {
+      var fileName: String
+      init(fileName: String) {
+          self.fileName = fileName
+          print("Opening file: \(fileName)")
+      }
+
+      deinit {
+          print("Closing file: \(fileName)")
+      }
+  }
+
+  var handler: FileHandler? = FileHandler(fileName: "data.txt")
+  handler = nil // "Closing file: data.txt" 출력
+  ```
+
+### 6. 타입 캐스팅 (Type Casting)
+- 타입을 확인하거나 다른 타입으로 변환할 때 사용됨. `as?`와 `as!` 연산자는 안전한 다운캐스팅과 강제 다운캐스팅을 의미함.
+  ```swift
+  class Animal {}
+  class Dog: Animal {}
+
+  let pet: Animal = Dog()
+  if let dog = pet as? Dog {
+      print("This is a dog")
+  } else {
+      print("This is not a dog")
+  }
+  ```
+- 프로토콜과 제네릭을 사용해 타입 캐스팅을 최소화하는 것이 권장됨.
+
+### 7. 프로토콜 (Protocols)
+- 클래스와 구조체가 특정 기능을 구현하도록 요구하는 청사진 역할을 함. `optional` 요구사항은 `@objc`와 함께 사용되며 UIKit과의 호환성을 위해 제공됨.
+  ```swift
+  protocol Greetable {
+      func greet()
+  }
+
+  class Person: Greetable {
+      func greet() {
+          print("Hello!")
+      }
+  }
+  ```
+
+### 8. 자동 참조 카운팅 (Automatic Reference Counting)
+- 참조 타입 객체의 메모리 관리를 자동으로 수행함. 강한(`strong`), 약한(`weak`), 비소유(`unowned`) 참조를 통해 메모리 누수를 방지함.
+
+### 9. 메모리 안전성 (Memory Safety)
+- Swift는 메모리 접근이 중복되지 않도록 안전하게 관리함. 예외적인 상황에서 로우 레벨 데이터 조작이 필요한 경우 이해가 필요함.
+  ```swift
+  var number = 5
+  withUnsafeMutablePointer(to: &number) { pointer in
+      pointer.pointee += 1
+  }
+  print(number) // 6
+  ```
+
+### 10. 접근 제어 (Access Control)
+- 모듈 내 코드의 가시성을 제어함. `open`, `public`, `internal`, `fileprivate`, `private` 접근 수준을 제공함.
+- 서브클래싱과 확장에서 접근 제어를 적절히 설정해 보안과 모듈성을 유지함.
+
+## Swift API Guidelines 요약
+
+### 1. 문서 주석 작성하기 (Write a documentation comment)
+- 코드를 설명하는 주석을 명확하고 간결하게 작성합니다.
+- 읽는 사람이 코드를 쉽게 이해할 수 있도록 의도를 명확히 표현해야 합니다.
+- 공통 포맷을 따르고, 적절한 문법과 스타일을 사용합니다.
+
+### 2. 케이스 규칙 따르기 (Follow case conventions)
+- Swift에서는 camelCase를 사용합니다.
+- 타입과 프로토콜 이름은 대문자로 시작하고, 함수 및 변수 이름은 소문자로 시작합니다.
+- 약어는 통일성을 유지하며, 전체 단어를 사용하는 것이 권장됩니다.
+
+### 3. 매개변수 레이블 (Argument Labels)
+- 함수 및 메서드에서 매개변수 레이블은 함수 호출 시 의도가 명확하게 보이도록 만듭니다.
+- 첫 번째 매개변수는 함수 이름과 자연스럽게 연결되도록 설계합니다.
+- 불필요한 레이블은 제거하여 간결하게 유지합니다.
+
+### 4. Unconstrained Polymorphism 무시 가능
+- `Any` 및 `AnyObject`와 같은 타입은 다루지 않아도 됩니다.
