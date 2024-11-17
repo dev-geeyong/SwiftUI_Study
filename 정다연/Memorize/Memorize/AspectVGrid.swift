@@ -19,18 +19,18 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
   }
   
   var body: some View {
-    GeometryReader { geometry in
-      let gridItemSize = gridItemWidthThatFits(
-        count: items.count,
-        size: geometry.size,
-        atAspectRatio: aspectRatio)
-      LazyVGrid(columns: [GridItem(.adaptive(minimum: gridItemSize), spacing: 0)], spacing: 0) {
+//    GeometryReader { geometry in
+//      let gridItemSize = gridItemWidthThatFits(
+//        count: items.count,
+//        size: geometry.size,
+//        atAspectRatio: aspectRatio)
+      LazyVGrid(columns: [GridItem(.adaptive(minimum: 65), spacing: 0)], spacing: 0) {
         ForEach(items) { item in
           content(item)
             .aspectRatio(aspectRatio, contentMode: .fit)
         }
       }
-    }
+//    }
   }
   
   // 주어진 공간 안에
