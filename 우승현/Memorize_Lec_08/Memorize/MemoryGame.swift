@@ -29,25 +29,23 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
     
     mutating func choose(_ card: Card) {
         if let chosenIndex = cards.firstIndex(where: { $0.id == card.id }) {
-            print("Card chosen: \(chosenIndex)")
-            // 고른 카드가 뒷면이고, 매치되지 않은 경우
             if !cards[chosenIndex].isFaceUp && !cards[chosenIndex].isMatched {
                 if let potentialMatchIndex = indexOfTheOneAndOnlyFaceUpCard {
-                    cards[chosenIndex].hasBeenFlipped += 1
-                    cards[potentialMatchIndex].hasBeenFlipped += 1
-                    print("\(chosenIndex)과 \(potentialMatchIndex) 카드를 비교합니다.")
-                    // Match Case
                     if cards[chosenIndex].content == cards[potentialMatchIndex].content {
-                        print("\(chosenIndex)과 \(potentialMatchIndex) 카드가 같습니다.")
                         cards[chosenIndex].isMatched = true
                         cards[potentialMatchIndex].isMatched = true
-                        score += 1
-                    } else if cards[chosenIndex].hasBeenFlipped > 1 || cards[potentialMatchIndex].hasBeenFlipped > 1 {
-                        score -= 1
+                        score += 2
+                    } else {
+                        if cards[chosenIndex].hasBeenSeen {
+                            score -= 1
+                        }
+                        if cards[potentialMatchIndex].hasBeenSeen {
+                            score -= 1
+                        }
                     }
                 } else {
+                    indexOfTheOneAndOnlyFaceUpCard = chosenIndex
                 }
-                indexOfTheOneAndOnlyFaceUpCard = chosenIndex
                 cards[chosenIndex].isFaceUp = true
             }
         }
@@ -58,11 +56,17 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
     }
     
     struct Card: Equatable, Identifiable, CustomDebugStringConvertible {
-        var isFaceUp = false
+        var isFaceUp = false {
+            didSet {
+                if oldValue && !isFaceUp {
+                    hasBeenSeen = true
+                }
+            }
+        }
+        var hasBeenSeen = false
         var isMatched = false
         let content: CardContent
         var id: String
-        var hasBeenFlipped: Int = 0
         
         var debugDescription: String {
             "\(id): \(content)"

@@ -80,19 +80,42 @@ struct CardView: View {
     var body: some View {
         ZStack {
             let base = RoundedRectangle(cornerRadius: 12)
-            Group {
-                base.fill(.white)
-                base.strokeBorder(lineWidth: 2)
-                Text(card.content)
-                    .font(.system(size: 200))
-                    .minimumScaleFactor(0.01)
-                    .aspectRatio(contentMode: .fit)
-            }
-            .opacity(card.isFaceUp ? 1:0)
+            base.strokeBorder(lineWidth: 2)
+                .background(base.fill(.white))
+                .opacity(card.isFaceUp ? 1 : 0)
+            Text(card.content)
+                .font(.system(size: Constants.FontSize.largest))
+                .minimumScaleFactor(Constants.FontSize.scaleFactor)
+                .multilineTextAlignment(.center)
+                .aspectRatio(1, contentMode: .fit)
+                .padding(Constants.Pie.inset)
+                .rotationEffect(.degrees(card.isMatched ? 360 : 0))
+                .animation(.spin(duration: 1), value: card.isMatched)
+                .opacity(card.isFaceUp ? 1 : 0)
             base.fill()
-                .opacity(card.isFaceUp ? 0:1)
+                .opacity(card.isFaceUp ? 0 : 1)
         }
+        .padding(Constants.inset)
         .opacity(card.isFaceUp || !card.isMatched ? 1 : 0)
+    }
+    
+    private struct Constants {
+        static let inset: CGFloat = 5
+        struct FontSize {
+            static let largest: CGFloat = 200
+            static let smallest: CGFloat = 10
+            static let scaleFactor = smallest / largest
+        }
+        struct Pie {
+            static let opacity: CGFloat = 0.4
+            static let inset: CGFloat = 5
+        }
+    }
+}
+
+extension Animation {
+    static func spin(duration: TimeInterval) -> Animation {
+        .linear(duration: 1).repeatForever(autoreverses: false)
     }
 }
 
