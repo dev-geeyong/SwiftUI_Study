@@ -636,7 +636,129 @@ let y = x ?? "foo"
 }
 
 # 8강
+**SwiftUI 8강: 애니메이션 및 Property Observer 정리**
 
+### 1. Property Observers와 `.onChange(of:)`
+
+- **Property Observers**
+  - `willSet`과 `didSet`을 사용해 속성 값이 변경될 때 특정 작업을 실행할 수 있음
+  - 예시:
+    ```swift
+    var isFaceUp: Bool {
+        willSet {
+            if newValue {
+                startUsingBonusTime()
+            } else {
+                stopUsingBonusTime()
+            }
+        }
+    }
+    ```
+
+- **`.onChange(of:)`**
+  - `@State`나 `@ViewModel` 변수의 값이 변경될 때 반응하기 위해 사용하는 `ViewModifier`
+  - 예시:
+    ```swift
+    @State private var taps = 0
+    
+    Text("\(taps) taps")
+        .onChange(of: viewModel.cards) { newCards in
+            taps += 1
+        }
+    ```
+
+### 2. 애니메이션
+
+- **암시적 애니메이션 vs. 명시적 애니메이션**
+  - **암시적 애니메이션**은 자동으로 View의 변화를 애니메이션으로 처리합니다. 주로 `leaf` View에 적용
+    ```swift
+    Text("Hello")
+        .opacity(isVisible ? 1 : 0)
+        .animation(.easeInOut, value: isVisible)
+    ```
+  - **명시적 애니메이션**은 코드 블록 내의 모든 변화를 함께 애니메이션화
+    ```swift
+    withAnimation(.linear(duration: 2)) {
+        viewModel.changeState()
+    }
+    ```
+
+- **Transitions**
+  - **전환(Transition)**은 View가 등장하거나 사라질 때 적용되는 애니메이션
+  - 예시:
+    ```swift
+    ZStack {
+        if isFaceUp {
+            RoundedRectangle(cornerRadius: 10).stroke()
+                .transition(.scale)
+            Text("\u{1F31F}").transition(.scale)
+        } else {
+            RoundedRectangle(cornerRadius: 10).transition(.identity)
+        }
+    }
+    ```
+
+- **Animation Struct와 애니메이션 곡선**
+  - `Animation`은 애니메이션의 지속 시간, 반복 여부, 곡선 등을 제어할 수 있음
+    ```swift
+    .animation(.easeInOut(duration: 2))
+    ```
+  - **애니메이션 곡선**
+    - `.linear`: 일정한 속도로 진행
+    - `.easeInOut`: 천천히 시작하고 빨라지다가 다시 천천히
+    - `.spring`: 부드럽게 끝나는 탄성 효과
+
+### 3. Matched Geometry Effect
+
+- **Matched Geometry Effect**는 두 View 간의 위치와 크기를 동기화하여 자연스럽게 전환하는 애니메이션을 만듦
+  - 예시:
+    ```swift
+    @Namespace private var myNamespace
+    
+    if isCardDealt {
+        CardView()
+            .matchedGeometryEffect(id: "card", in: myNamespace)
+    } else {
+        DeckView()
+            .matchedGeometryEffect(id: "card", in: myNamespace)
+    }
+    ```
+
+### 4. Shape 및 ViewModifier 애니메이션
+
+- **애니메이션 데이터 통신**
+  - `Animatable` 프로토콜을 구현한 `Shape` 또는 `ViewModifier`에서 애니메이션 데이터를 설정
+  - 예시:
+    ```swift
+    struct RotatingShape: Shape {
+        var rotation: Double
+        
+        var animatableData: Double {
+            get { rotation }
+            set { rotation = newValue }
+        }
+        
+        func path(in rect: CGRect) -> Path {
+            var path = Path()
+            path.addRect(rect.applying(CGAffineTransform(rotationAngle: CGFloat(rotation))))
+            return path
+        }
+    }
+    ```
+
+### 5. `.onAppear` 애니메이션
+
+- **`.onAppear` 사용**
+  - View가 화면에 나타날 때 특정 애니메이션을 시작하려면 `.onAppear`를 사용
+  - 예시:
+    ```swift
+    Text("Hello World")
+        .onAppear {
+            withAnimation {
+                self.isVisible = true
+            }
+        }
+    ```
 
 # 10강 Assignment
 
