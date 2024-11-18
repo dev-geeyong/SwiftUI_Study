@@ -479,6 +479,163 @@ let x: String? = ...
 let y = x ?? "foo"
 ```
 
+# 7강
+
+1. **Demo Interlude**
+   - **뷰 분리**: `CardView`를 별도의 Swift 파일로 분리.
+   - **상수 처리**: Swift 코드 내에서 상수를 처리하는 방법.
+
+   ```swift
+   // CardView.swift
+   struct CardView: View {
+       var card: Card
+
+       var body: some View {
+           ZStack {
+               if card.isFaceUp {
+                   RoundedRectangle(cornerRadius: 10).fill(Color.white)
+                   RoundedRectangle(cornerRadius: 10).stroke(lineWidth: 3)
+                   Text(card.content)
+               } else {
+                   RoundedRectangle(cornerRadius: 10).fill()
+               }
+           }
+       }
+   }
+   ```
+
+2. **Shape**
+   - **커스텀 도형 그리기**: SwiftUI에서 도형을 직접 정의.
+   - **Pie 모양 카운트다운 타이머**를 카드 위에 그리기 (애니메이션 없음).
+
+   ```swift
+   struct Pie: Shape {
+       var startAngle: Angle
+       var endAngle: Angle
+       var clockwise: Bool
+
+       func path(in rect: CGRect) -> Path {
+           var path = Path()
+           let center = CGPoint(x: rect.midX, y: rect.midY)
+           let radius = min(rect.width, rect.height) / 2
+           path.move(to: center)
+           path.addArc(center: center,
+                       radius: radius,
+                       startAngle: startAngle,
+                       endAngle: endAngle,
+                       clockwise: !clockwise)
+           return path
+       }
+   }
+   ```
+
+3. **Animation**
+   - **애니메이션이란 무엇인가?**
+   - **뷰의 애니메이션 적용**: `ViewModifiers`를 사용해 뷰에 애니메이션을 적용.
+
+   ```swift
+   @State private var isAnimating = false
+
+   var body: some View {
+       Circle()
+           .fill(isAnimating ? Color.red : Color.blue)
+           .frame(width: 100, height: 100)
+           .onTapGesture {
+               withAnimation {
+                   isAnimating.toggle()
+               }
+           }
+   }
+   ```
+
+4. **ViewModifier**
+   - **ViewModifier 사용법**: `modifier()` 메소드를 사용해 뷰에 모디파이어 적용.
+   - **카드 스타일링**: `Cardify` 모디파이어를 사용해 카드 스타일 적용.
+
+   ```swift
+   struct Cardify: ViewModifier {
+       var isFaceUp: Bool
+
+       func body(content: Content) -> some View {
+           ZStack {
+               if isFaceUp {
+                   RoundedRectangle(cornerRadius: 10).fill(Color.white)
+                   RoundedRectangle(cornerRadius: 10).stroke(lineWidth: 3)
+                   content
+               } else {
+                   RoundedRectangle(cornerRadius: 10).fill()
+               }
+           }
+       }
+   }
+
+   extension View {
+       func cardify(isFaceUp: Bool) -> some View {
+           self.modifier(Cardify(isFaceUp: isFaceUp))
+       }
+   }
+   ```
+
+5. **Swift Type System**
+   - **프로토콜**
+     - 코드 공유를 촉진하는 목적으로 사용.
+     - 프로토콜에 **extension**을 추가해 구현을 확장할 수 있음.
+
+   ```swift
+   protocol Identifiable {
+       var id: String { get }
+   }
+
+   extension Identifiable {
+       func describe() -> String {
+           return "ID: \(id)"
+       }
+   }
+   ```
+
+6. **Generics + Protocols**
+   - **제네릭 타입과 프로토콜**의 조합을 활용해 코드의 유연성을 증가.
+   - **Identifiable** 프로토콜의 `associatedtype`을 통해 특정 타입 제약 적용.
+
+   ```swift
+   protocol Identifiable {
+       associatedtype ID: Hashable
+       var id: ID { get }
+   }
+
+   struct User: Identifiable {
+       var id: String
+   }
+   ```
+
+7. **some 키워드**
+   - **`some` 키워드**를 사용해 반환 타입을 불투명하게 설정.
+
+   ```swift
+   func createShape(rounded: Bool) -> some Shape {
+       if rounded {
+           return RoundedRectangle(cornerRadius: 10)
+       } else {
+           return Circle()
+       }
+   }
+   ```
+
+   - **뷰 빌더와의 차이**: `@ViewBuilder`는 항상 같은 타입을 반환해야 함.
+
+
+8. **any 키워드**
+   - **다형성 배열** 생성 시 사용.
+   - **Heterogeneous Collection**을 생성하는 데 유용함.
+
+   ```swift
+   let items: [any Identifiable] = [User(id: "123"), User(id: "456")]
+   ```
+    }
+  ]
+}
+
+# 8강
 
 
 # 10강 Assignment
