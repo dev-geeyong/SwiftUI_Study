@@ -2,7 +2,7 @@
 //  Cardify.swift
 //  Memorize
 //
-//  Created by 우승현 on 11/18/24.
+//  Created by 우승현 on 11/24/24.
 //
 
 import SwiftUI
@@ -28,7 +28,7 @@ struct Cardify: ViewModifier, Animatable {
                 .background(base.fill(.white))
                 .overlay(content)
                 .opacity(isFaceUp ? 1 : 0)
-            base.fill()
+            base.fill(.orange)
                 .opacity(isFaceUp ? 0 : 1)
         }
         .rotation3DEffect(.degrees(rotation), axis: (0,1,0))
