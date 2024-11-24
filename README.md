@@ -479,7 +479,286 @@ let x: String? = ...
 let y = x ?? "foo"
 ```
 
+# 7강
 
+1. **Demo Interlude**
+   - **뷰 분리**: `CardView`를 별도의 Swift 파일로 분리.
+   - **상수 처리**: Swift 코드 내에서 상수를 처리하는 방법.
+
+   ```swift
+   // CardView.swift
+   struct CardView: View {
+       var card: Card
+
+       var body: some View {
+           ZStack {
+               if card.isFaceUp {
+                   RoundedRectangle(cornerRadius: 10).fill(Color.white)
+                   RoundedRectangle(cornerRadius: 10).stroke(lineWidth: 3)
+                   Text(card.content)
+               } else {
+                   RoundedRectangle(cornerRadius: 10).fill()
+               }
+           }
+       }
+   }
+   ```
+
+2. **Shape**
+   - **커스텀 도형 그리기**: SwiftUI에서 도형을 직접 정의.
+   - **Pie 모양 카운트다운 타이머**를 카드 위에 그리기 (애니메이션 없음).
+
+   ```swift
+   struct Pie: Shape {
+       var startAngle: Angle
+       var endAngle: Angle
+       var clockwise: Bool
+
+       func path(in rect: CGRect) -> Path {
+           var path = Path()
+           let center = CGPoint(x: rect.midX, y: rect.midY)
+           let radius = min(rect.width, rect.height) / 2
+           path.move(to: center)
+           path.addArc(center: center,
+                       radius: radius,
+                       startAngle: startAngle,
+                       endAngle: endAngle,
+                       clockwise: !clockwise)
+           return path
+       }
+   }
+   ```
+
+3. **Animation**
+   - **애니메이션이란 무엇인가?**
+   - **뷰의 애니메이션 적용**: `ViewModifiers`를 사용해 뷰에 애니메이션을 적용.
+
+   ```swift
+   @State private var isAnimating = false
+
+   var body: some View {
+       Circle()
+           .fill(isAnimating ? Color.red : Color.blue)
+           .frame(width: 100, height: 100)
+           .onTapGesture {
+               withAnimation {
+                   isAnimating.toggle()
+               }
+           }
+   }
+   ```
+
+4. **ViewModifier**
+   - **ViewModifier 사용법**: `modifier()` 메소드를 사용해 뷰에 모디파이어 적용.
+   - **카드 스타일링**: `Cardify` 모디파이어를 사용해 카드 스타일 적용.
+
+   ```swift
+   struct Cardify: ViewModifier {
+       var isFaceUp: Bool
+
+       func body(content: Content) -> some View {
+           ZStack {
+               if isFaceUp {
+                   RoundedRectangle(cornerRadius: 10).fill(Color.white)
+                   RoundedRectangle(cornerRadius: 10).stroke(lineWidth: 3)
+                   content
+               } else {
+                   RoundedRectangle(cornerRadius: 10).fill()
+               }
+           }
+       }
+   }
+
+   extension View {
+       func cardify(isFaceUp: Bool) -> some View {
+           self.modifier(Cardify(isFaceUp: isFaceUp))
+       }
+   }
+   ```
+
+5. **Swift Type System**
+   - **프로토콜**
+     - 코드 공유를 촉진하는 목적으로 사용.
+     - 프로토콜에 **extension**을 추가해 구현을 확장할 수 있음.
+
+   ```swift
+   protocol Identifiable {
+       var id: String { get }
+   }
+
+   extension Identifiable {
+       func describe() -> String {
+           return "ID: \(id)"
+       }
+   }
+   ```
+
+6. **Generics + Protocols**
+   - **제네릭 타입과 프로토콜**의 조합을 활용해 코드의 유연성을 증가.
+   - **Identifiable** 프로토콜의 `associatedtype`을 통해 특정 타입 제약 적용.
+
+   ```swift
+   protocol Identifiable {
+       associatedtype ID: Hashable
+       var id: ID { get }
+   }
+
+   struct User: Identifiable {
+       var id: String
+   }
+   ```
+
+7. **some 키워드**
+   - **`some` 키워드**를 사용해 반환 타입을 불투명하게 설정.
+
+   ```swift
+   func createShape(rounded: Bool) -> some Shape {
+       if rounded {
+           return RoundedRectangle(cornerRadius: 10)
+       } else {
+           return Circle()
+       }
+   }
+   ```
+
+   - **뷰 빌더와의 차이**: `@ViewBuilder`는 항상 같은 타입을 반환해야 함.
+
+
+8. **any 키워드**
+   - **다형성 배열** 생성 시 사용.
+   - **Heterogeneous Collection**을 생성하는 데 유용함.
+
+   ```swift
+   let items: [any Identifiable] = [User(id: "123"), User(id: "456")]
+   ```
+    }
+  ]
+}
+
+# 8강
+**SwiftUI 8강: 애니메이션 및 Property Observer 정리**
+
+### 1. Property Observers와 `.onChange(of:)`
+
+- **Property Observers**
+  - `willSet`과 `didSet`을 사용해 속성 값이 변경될 때 특정 작업을 실행할 수 있음
+  - 예시:
+    ```swift
+    var isFaceUp: Bool {
+        willSet {
+            if newValue {
+                startUsingBonusTime()
+            } else {
+                stopUsingBonusTime()
+            }
+        }
+    }
+    ```
+
+- **`.onChange(of:)`**
+  - `@State`나 `@ViewModel` 변수의 값이 변경될 때 반응하기 위해 사용하는 `ViewModifier`
+  - 예시:
+    ```swift
+    @State private var taps = 0
+    
+    Text("\(taps) taps")
+        .onChange(of: viewModel.cards) { newCards in
+            taps += 1
+        }
+    ```
+
+### 2. 애니메이션
+
+- **암시적 애니메이션 vs. 명시적 애니메이션**
+  - **암시적 애니메이션**은 자동으로 View의 변화를 애니메이션으로 처리합니다. 주로 `leaf` View에 적용
+    ```swift
+    Text("Hello")
+        .opacity(isVisible ? 1 : 0)
+        .animation(.easeInOut, value: isVisible)
+    ```
+  - **명시적 애니메이션**은 코드 블록 내의 모든 변화를 함께 애니메이션화
+    ```swift
+    withAnimation(.linear(duration: 2)) {
+        viewModel.changeState()
+    }
+    ```
+
+- **Transitions**
+  - **전환(Transition)**은 View가 등장하거나 사라질 때 적용되는 애니메이션
+  - 예시:
+    ```swift
+    ZStack {
+        if isFaceUp {
+            RoundedRectangle(cornerRadius: 10).stroke()
+                .transition(.scale)
+            Text("\u{1F31F}").transition(.scale)
+        } else {
+            RoundedRectangle(cornerRadius: 10).transition(.identity)
+        }
+    }
+    ```
+
+- **Animation Struct와 애니메이션 곡선**
+  - `Animation`은 애니메이션의 지속 시간, 반복 여부, 곡선 등을 제어할 수 있음
+    ```swift
+    .animation(.easeInOut(duration: 2))
+    ```
+  - **애니메이션 곡선**
+    - `.linear`: 일정한 속도로 진행
+    - `.easeInOut`: 천천히 시작하고 빨라지다가 다시 천천히
+    - `.spring`: 부드럽게 끝나는 탄성 효과
+
+### 3. Matched Geometry Effect
+
+- **Matched Geometry Effect**는 두 View 간의 위치와 크기를 동기화하여 자연스럽게 전환하는 애니메이션을 만듦
+  - 예시:
+    ```swift
+    @Namespace private var myNamespace
+    
+    if isCardDealt {
+        CardView()
+            .matchedGeometryEffect(id: "card", in: myNamespace)
+    } else {
+        DeckView()
+            .matchedGeometryEffect(id: "card", in: myNamespace)
+    }
+    ```
+
+### 4. Shape 및 ViewModifier 애니메이션
+
+- **애니메이션 데이터 통신**
+  - `Animatable` 프로토콜을 구현한 `Shape` 또는 `ViewModifier`에서 애니메이션 데이터를 설정
+  - 예시:
+    ```swift
+    struct RotatingShape: Shape {
+        var rotation: Double
+        
+        var animatableData: Double {
+            get { rotation }
+            set { rotation = newValue }
+        }
+        
+        func path(in rect: CGRect) -> Path {
+            var path = Path()
+            path.addRect(rect.applying(CGAffineTransform(rotationAngle: CGFloat(rotation))))
+            return path
+        }
+    }
+    ```
+
+### 5. `.onAppear` 애니메이션
+
+- **`.onAppear` 사용**
+  - View가 화면에 나타날 때 특정 애니메이션을 시작하려면 `.onAppear`를 사용
+  - 예시:
+    ```swift
+    Text("Hello World")
+        .onAppear {
+            withAnimation {
+                self.isVisible = true
+            }
+        }
+    ```
 
 # 10강 Assignment
 
