@@ -8,12 +8,14 @@ import SwiftUI
 
 struct EmojiMemoryGameView: View {
     typealias Cards = MemoryGame<String>.Card
+    // 데이터 변경 시 UI 업데이트
     @ObservedObject var viewModel: EmojiMemoryGame
     
     private let aspectRatio: CGFloat = 2/3
     private let spacing: CGFloat = 4
     private let dealAnimation: Animation = .easeInOut(duration: 1)
     private let dealInterval: TimeInterval = 0.15
+    // 덱크기
     private let deckWidth: CGFloat = 50
     
     var body: some View {
@@ -86,25 +88,27 @@ struct EmojiMemoryGameView: View {
         }
     }
     
+    // 딜
     private func deal() {
         var delay: TimeInterval = 0
         for card in viewModel.cards {
-            withAnimation(dealAnimation.delay(delay)) {
+            withAnimation(dealAnimation.delay(delay)) { // 순차적으로 딜 되게 하기 위해
                 _ = dealt.insert(card.id)
             }
             delay += dealInterval
         }
     }
     
+    // 카드 선택
     private func choose(_ card: Card) {
         withAnimation {
             let scoreBeforeChoosing = viewModel.score
-            viewModel.choose(card)
+            viewModel.choose(card) // 카드 선택 시 모델 업데이트
             let scoreChange = viewModel.score - scoreBeforeChoosing
-            lastScoreChange = (scoreChange, causedByCardId: card.id)
+            lastScoreChange = (scoreChange, causedByCardId: card.id) // 점수 변화 기록
         }
     }
-    
+    // 마지막 점수 변화 저장
     @State private var lastScoreChange = (0, causedByCardId: "")
     
     private func scoreChange(causedBy card: Card) -> Int {

@@ -5,12 +5,12 @@
 //
 
 import SwiftUI
-
-// ObservableObject allows for the creation of class objects that can announce to the View that properties have changed.
+// 뷰모델
 class EmojiMemoryGame: ObservableObject {
     typealias Card = MemoryGame<String>.Card
     private static let emojis = ["👻", "🎃", "🦇","🧛","⚰️","🪄","🔮","🧿","🦄","🍭","🧙","🧌"]
     
+    // 새로운 MemoryGame 인스턴스를 생성
     private static func createMemoryGame() -> MemoryGame<String> {
         return MemoryGame<String>(numberOfPairsOfCards: 8) { pairIndex in
             if emojis.indices.contains(pairIndex){
@@ -21,9 +21,10 @@ class EmojiMemoryGame: ObservableObject {
         }
     }
     
-    // Changes to the @Published var should trigger View reloads.
+    // 모델 변경 시 SwiftUI 뷰가 자동으로 다시 렌더링
     @Published private var model = createMemoryGame()
     
+    // 모델에 의존 되는 요소
     var cards: Array<Card> {
         model.cards
     }

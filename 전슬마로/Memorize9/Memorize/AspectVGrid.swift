@@ -5,7 +5,7 @@
 //
 
 import SwiftUI
-
+// 그리드 배열역할
 struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
     var items: [Item]
     var aspectRatio: CGFloat = 1

@@ -6,38 +6,49 @@
 
 import Foundation
 
+// 카드가 서로 같거나 다른지 비교할 수 있게 Equatable 준수
 struct MemoryGame<CardContent> where CardContent: Equatable {
-    // private(set) allows for read-only public access
-    // private means that only this struct can modify the value vs fileprivate (scoped by any code in the same file)
+    /// 게임에 사용되는 카드 배열
     private(set) var cards: Array<Card>
+    /// 현재 게임의 점수
     private(set) var score = 0
     
-    // the cardContentFactory is a closure defined in the ViewModel
+    
+    /// MemoryGame 초기화
+    /// - Parameters:
+    ///   - numberOfPairsOfCards: 카드 쌍의 개수
+    ///   - cardContentFactory: 인덱스로 카드 반환
     init(numberOfPairsOfCards: Int, cardContentFactory: (Int) -> CardContent) {
         cards = Array<Card>()
         for pairIndex in 0..<max(2, numberOfPairsOfCards) {
             let content: CardContent = cardContentFactory(pairIndex)
+            // 같은것이 2장 있어야 하니 2장 생성
             cards.append(Card(content: content, id: "\(pairIndex+1)a"))
             cards.append(Card(content: content, id: "\(pairIndex+1)b"))
         }
     }
     
     var indexOfTheOneAndOnlyFaceUpCard: Int? {
-        // return the index of the card if only one card is face up
+        // 현재 뒤집힌 카드 인덱스
         get { cards.indices.filter { index in cards[index].isFaceUp }.only }
+        // 카드 뒤집기
         set { cards.indices.forEach { cards[$0].isFaceUp = (newValue == $0) } }
     }
     
+    // 카드를 선택했을 때 호출
     mutating func choose(_ card: Card) {
-        // returns the index of the chosen card by matching its id
+        // 선택된 카드의 인덱스를 찾음
         if let chosenIndex = cards.firstIndex(where: { $0.id == card.id }) {
             if !cards[chosenIndex].isFaceUp && !cards[chosenIndex].isMatched {
                 if let potentialMatchIndex = indexOfTheOneAndOnlyFaceUpCard {
+                    // 두 카드가 매치되었는지 확인
                     if cards[chosenIndex].content == cards[potentialMatchIndex].content {
+                        // 매치 처리
                         cards[chosenIndex].isMatched = true
                         cards[potentialMatchIndex].isMatched = true
                         score += 2 + cards[chosenIndex].bonus + cards[potentialMatchIndex].bonus
                     } else {
+                        // 매치되지 않으면 점수 차감
                         if cards[chosenIndex].hasBeenSeen {
                             score -= 1
                         }
@@ -53,6 +64,7 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
         }
     }
     
+    // 카드 섞기
     mutating func shuffle() {
         cards.shuffle()
     }
@@ -60,11 +72,13 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
     struct Card: Equatable, Identifiable, CustomStringConvertible {
         var isFaceUp = false {
             didSet {
+                // 카드가 뒤집힐 때 시간 측정
                 if isFaceUp {
                     startUsingBonusTime()
                 } else {
                     stopUsingBonusTime()
                 }
+                // 이전에 뒤집힌 기록
                 if oldValue && !isFaceUp {
                     hasBeenSeen = true
                 }
@@ -87,32 +101,29 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
         
         // MARK: - Bonus Time
         
-        // call this when the card transitions to face up state
+        // 시간계산
         private mutating func startUsingBonusTime() {
             if isFaceUp && !isMatched && bonusPercentRemaining > 0, lastFaceUpDate == nil {
                 lastFaceUpDate = Date()
             }
         }
         
-        // call this when the card goes back face down or gets matched
         private mutating func stopUsingBonusTime() {
             pastFaceUpTime = faceUpTime
             lastFaceUpDate = nil
         }
         
-        // the bonus earned so far (one point for every second of the bonusTimeLimit that was not used)
-        // this gets smaller and smaller the longer the card remains face up without being matched
+        // 현재까지 획득한 점수
         var bonus: Int {
             Int(bonusTimeLimit * bonusPercentRemaining)
         }
         
-        // percentage of the bonus time remaining
+        // 남아있는 보너스 시간 백분율
         var bonusPercentRemaining: Double {
             bonusTimeLimit > 0 ? max(0, bonusTimeLimit - faceUpTime)/bonusTimeLimit : 0
         }
         
-        // how long this card has ever been face up and unmatched during its lifetime
-        // basically, pastFaceUpTime + time since lastFaceUpDate
+        // 카드 뒤집힌 시간
         var faceUpTime: TimeInterval {
             if let lastFaceUpDate {
                 return pastFaceUpTime + Date().timeIntervalSince(lastFaceUpDate)
@@ -121,19 +132,14 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
             }
         }
         
-        // can be zero which would mean "no bonus available" for matching this card quickly
         var bonusTimeLimit: TimeInterval = 6
-        
-        // the last time this card was turned face up
         var lastFaceUpDate: Date?
-        
-        // the accumulated time this card was face up in the past
-        // (i.e. not including the current time it's been face up if it is currently so)
         var pastFaceUpTime: TimeInterval = 0
     }
 }
 
 extension Array {
+    /// 배열에 요소가 하나만 있는 경우 해당 요소를 반환
     var only: Element? {
         count == 1 ? first : nil
     }
