@@ -18,8 +18,8 @@ struct CardView: View {
         self.card = card
     }
     
-    var body: some View {
-        TimelineView(.animation) { timeline in
+    var body: some View { // 빈번한 업데이트 일어나서 무거운 작업은 피하자
+        TimelineView(.animation) { timeline in // 애니메이션 프레인마다 호출되어서 그려진다
             // 카드가 앞면이거나 매치되지 않은 상태일 때:
             if card.isFaceUp || !card.isMatched {
                 // 카드의 남은 시간에 따른 angle 정의

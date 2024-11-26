@@ -48,7 +48,7 @@ struct EmojiMemoryGameView: View {
     
     private var cards: some View {
         AspectVGrid(viewModel.cards, aspectRatio: aspectRatio) { card in
-            if isDealt(card) {
+            if isDealt(card) { // 딜 된것들에 대한 처리
                 CardView(card)
                     .matchedGeometryEffect(id: card.id, in: dealingNamespace)
                     .transition(.asymmetric(insertion: .identity, removal: .identity))
@@ -72,13 +72,15 @@ struct EmojiMemoryGameView: View {
         viewModel.cards.filter { !isDealt($0) }
     }
     
+    // matchedGeometryEffect 두개의 뷰간에 부드러운 전환 애니메이션
+    // namespace 를 통해서 동일 식별자 공유 인지
     @Namespace private var dealingNamespace
     
     private var deck: some View {
         ZStack {
             ForEach(undealtCards) { card in
                 CardView(card)
-                    .matchedGeometryEffect(id: card.id, in: dealingNamespace)
+                    .matchedGeometryEffect(id: card.id, in: dealingNamespace) // 자연스럽게 id 기준으로 이동 애니
                     .transition(.asymmetric(insertion: .identity, removal: .identity))
             }
             .frame(width: deckWidth, height: deckWidth/aspectRatio)
