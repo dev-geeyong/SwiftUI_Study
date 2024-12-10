@@ -44,11 +44,19 @@ struct SimpleEntry: TimelineEntry {
 
 struct WeatherWidgetEntryView: View {
     var entry: Provider.Entry
-        
+    
+    @Environment(\.widgetFamily) var widgetFamily
+    
     var body: some View {
         ZStack {
             Color("weatherBackgroundColor")
-            WeatherSubView(entry: entry)
+            HStack {
+                WeatherSubView(entry: entry)
+                if widgetFamily == .systemMedium {
+                    Image(entry.image)
+                        .resizable()
+                }
+            }
         }
     }
 }
@@ -80,12 +88,17 @@ struct WeatherSubView: View {
 
 struct WeatherWidget: Widget {
     let kind: String = "WeatherWidget"
-
+ 
     var body: some WidgetConfiguration {
-        AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
+        AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self,
+                  provider: Provider()) { entry in
             WeatherWidgetEntryView(entry: entry)
-                .containerBackground(.fill.tertiary, for: .widget)
+                .containerBackground(Color("weatherBackgroundColor"),
+                              for: .widget)
         }
+        .configurationDisplayName("My Weather Widget")
+        .description("A demo weather widget.")
+        .supportedFamilies([.systemSmall, .systemMedium])
     }
 }
 
@@ -103,7 +116,7 @@ extension ConfigurationAppIntent {
     }
 }
 
-#Preview(as: .systemSmall) {
+#Preview(as: .systemMedium) {
     WeatherWidget()
 } timeline: {
     WeatherEntry(date: Date(),
