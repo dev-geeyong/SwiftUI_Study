@@ -26,7 +26,8 @@ struct ContentView: View {
                     Label ("Tropical Storm", systemImage: "tropicalstorm")
                 }
             }
-            .navigationDestination(for: WeatherType.self) { weather in WeatherDetailView(weather: weather)
+            .navigationDestination(for: WeatherType.self) { weather in
+                WeatherDetailView(weather: weather)
             }
             .navigationTitle("Severe Weather")
         }

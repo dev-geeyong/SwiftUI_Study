@@ -27,7 +27,8 @@ struct WeatherDetailView: View {
     }
 }
 
-struct WeatherDetailView_Previews: PreviewProvider { static var previews: some View {
+struct WeatherDetailView_Previews: PreviewProvider { 
+    static var previews: some View {
         let weather = WeatherType(name: "Thunder Storms", icon: "cloud.bolt")
         WeatherDetailView(weather: weather)
     }
