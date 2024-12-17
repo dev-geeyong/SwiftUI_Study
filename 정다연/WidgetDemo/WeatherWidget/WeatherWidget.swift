@@ -16,7 +16,8 @@ struct Provider: AppIntentTimelineProvider {
             temperature: 89,
             description: "Thunder Storm",
             icon: "cloud.bolt.rain",
-            image: "thunder"
+            image: "thunder",
+            url: thunderUrl
         )
     }
 
@@ -27,7 +28,8 @@ struct Provider: AppIntentTimelineProvider {
             temperature: 89,
             description: "Thunder Storm",
             icon: "cloud.bolt.rain",
-            image: "thunder"
+            image: "thunder",
+            url: thunderUrl
         )
         
         return entry
@@ -61,6 +63,7 @@ struct WeatherWidgetEntryView : View {
         .containerBackground(for: .widget) {
             Color("weatherBackgroundColor")
         }
+        .widgetURL(entry.url)
     }
 }
 
@@ -103,7 +106,8 @@ struct WeatherWidget_Previews: PreviewProvider {
                                                    temperature: 89,
                                                    description: "Thunder Storm",
                                                    icon: "cloud.bolt.rain",
-                                                   image: "thunder"))
+                                                   image: "thunder",
+                                                   url: thunderUrl))
         .previewContext(WidgetPreviewContext(family: .systemSmall))
         
     }
