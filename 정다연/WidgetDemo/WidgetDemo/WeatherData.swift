@@ -8,6 +8,22 @@
 import Foundation
 import WidgetKit
 
+struct LocationData: Identifiable {
+    let city: String
+    let timeline: [WeatherEntry]
+    
+    var id: String {
+        city
+    }
+    
+    static let london = LocationData(city: "London", timeline: londonTimeline) 
+    static let miami = LocationData(city: "Miami", timeline: miamiTimeline)
+    
+    func hash(into hasher: inout Hasher) { 
+        hasher.combine(city)
+    }
+}
+
 struct WeatherEntry: TimelineEntry {
     var date: Date
     let city: String
